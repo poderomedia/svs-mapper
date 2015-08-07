@@ -1,0 +1,20 @@
+#IDE Settings
+.idea/*
+
+*.egg
+*.pyc
+
+*.txt
+*.bak
+
+#media files
+*.jpg
+*.wmv
+*.mp3
+*.swf
+
+
+#json scrapping
+*.json
+*.csv
+*.rar
