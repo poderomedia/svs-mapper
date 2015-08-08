@@ -12,7 +12,9 @@ class ExecutivesSpider(scrapy.Spider):
     base_url = 'http://www.svs.cl/institucional/mercados/'
     start_urls = (
         'http://www.svs.cl/institucional/mercados/listado_actual_ejecutivos.php?mercado=V',
+        'http://www.svs.cl/institucional/mercados/listado_actual_ejecutivos.php?mercado=S'
     )
+    today = date.today()
 
     def parse(self, response):
         hxs = Selector(response)

@@ -12,6 +12,7 @@ class SvsSpider(scrapy.Spider):
     base_url = 'http://www.svs.cl/institucional/mercados/'
     start_urls = [
         'http://www.svs.cl/institucional/mercados/listado_actual_directorios.php?mercado=V',
+        'http://www.svs.cl/institucional/mercados/listado_actual_directorios.php?mercado=S'
     ]
     today = date.today()
 
