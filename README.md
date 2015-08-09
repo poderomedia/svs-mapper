@@ -1,8 +1,12 @@
 #SVS Mappers Scraping
 
 This repo contains the project for scrapping data in the SVS site (Chile).
-The project was builded using the Scrapy Framework.
+The project was builded using the python Scrapy Framework.
 
+## Requirements
+
+* python 2.7
+* Scrapy Framework 0.24.6
 
 ## Data Structure
 
