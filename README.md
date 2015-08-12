@@ -19,6 +19,7 @@ Please send request to add new sites in the issues section.
 ## Installation
 
 If you have Windows, Mac or any Linux, you must follow these instructions.
+* Open a terminal window.
 * Clone the repo: ``git clone https://github.com/poderomedia/svs-mapper``
 * Move to the repo directory: ``cd svs-mapper``
 * Install the requirements: ``pip install requirements.txt``
