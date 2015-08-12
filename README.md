@@ -6,7 +6,10 @@ The project was builded using the python Scrapy Framework.
 ## The Site
 
 ``http://www.svs.cl``
-* Contains data from companies regulated by SVS - Chile (Superintendencia de valores y Servicios) 
+* Contains data from companies regulated by SVS - Chile (Superintendencia de valores y Servicios)
+
+Observation: We have plans for scrapping all the similar sites in SouthAmerica and Caribean Region.
+Please send request to add new sites in the issues section.
 
 ## Requirements
 
