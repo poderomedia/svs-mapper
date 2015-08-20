@@ -28,6 +28,7 @@ That's all.
 
 ## Data Structure
 
+* id: unique id (hash)
 * type: indicates the type of the entity (Boards, Executives, StockHolders, Company)
 * company_ICN: Company code (Chile - RUT)
 * company_name: name of the company
@@ -36,13 +37,16 @@ That's all.
 * person_jobtitle: Job title of the Person in the Company
 * person_jobtitle_desc: Extra data about the Job title position
 * person_datejob: start date of the person job title
+* person_datejob_end: end date of the person job title (default is ´-1´ that indicates ´to present´)
+* reference: indicates the reference url with the scraped data
 * scanner_date: indicates when was obtained that data (running the spider)
 
 ## The spiders
 
 There are the following spider:
-* svs: return all the Boards members
-* executives: return all the Executives members
+* svs: return all the present Boards members
+* executives: return all the present Executives members
+* historic_boards: return all the historic Board members (Past ans Present)
 
 
 ## Running a specific spider
