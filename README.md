@@ -54,7 +54,7 @@ There are the following spider:
 * svs: return all the present Boards members
 * executives: return all the present Executives members
 * historic_boards: return all the historic Board members (Past ans Present)
-* sanciones: return all sanctions between to dates (default: 01-01-2001 to present day)
+* sanciones: return all sanctions between two dates (default: 01-01-2001 to present day)
 
 
 ## Running a specific spider
