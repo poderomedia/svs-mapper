@@ -13,6 +13,9 @@ class Directory(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     id = Field()
+    doc_ext_id = Field()
+    doc_date = Field()
+    doc_desc = Field()
     type = Field()
     company_ICN = Field()
     company_name = Field()
@@ -24,4 +27,5 @@ class Directory(scrapy.Item):
     person_datejob_end = Field()
     scanner_date = Field()
     reference = Field()
+    doc_url = Field()
 

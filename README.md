@@ -29,7 +29,7 @@ That's all.
 ## Data Structure
 
 * id: unique id (hash)
-* type: indicates the type of the entity (Boards, Executives, StockHolders, Company)
+* type: indicates the type of the entity (Boards, Executives, StockHolders, Company, Sanctions)
 * company_ICN: Company code (Chile - RUT)
 * company_name: name of the company
 * person_ICN: Person Code Number (Chile - RUT)
@@ -41,12 +41,20 @@ That's all.
 * reference: indicates the reference url with the scraped data
 * scanner_date: indicates when was obtained that data (running the spider)
 
+###Documents Fields:
+* doc_ext_id: External ID of the document
+* doc_date: Date of the Document
+* doc_desc: Description of the Document
+* doc_url: Url of the Document
+
+
 ## The spiders
 
 There are the following spider:
 * svs: return all the present Boards members
 * executives: return all the present Executives members
 * historic_boards: return all the historic Board members (Past ans Present)
+* sanciones: return all sanctions between to dates (default: 01-01-2001 to present day)
 
 
 ## Running a specific spider

@@ -27,7 +27,7 @@ class HistoricBoardsSpider(Spider):
             director = Directory()
             director['person_ICN'] = ''.join(item.xpath('td[1]/a/text()').extract()).strip()
             director['person_name'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
-            director['type'] = 'Board'
+            #director['type'] = 'Board'
             link = self.base_url + ''.join(item.xpath('td[2]/a/@href').extract()).strip()
             request = Request(link,
                               callback = self.parse_details,
