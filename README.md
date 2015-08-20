@@ -41,7 +41,7 @@ That's all.
 * reference: indicates the reference url with the scraped data
 * scanner_date: indicates when was obtained that data (running the spider)
 
-###Documents Fields:
+### Documents Fields:
 * doc_ext_id: External ID of the document
 * doc_date: Date of the Document
 * doc_desc: Description of the Document
