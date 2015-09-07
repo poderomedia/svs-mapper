@@ -4,6 +4,7 @@ from scrapy import Selector
 from svs_mapper.items import Directory
 from scrapy.http import Request, FormRequest
 from datetime import date
+import hashlib
 
 
 class EmpresasSpider(scrapy.Spider):
@@ -24,7 +25,25 @@ class EmpresasSpider(scrapy.Spider):
         'COBOL':'Corredores de Bolsa',
         'IVCBP':'Corredores de Bolsa de Productos',
         'RG268':'Deportivas no profesionales, de beneficencia o educacionales',
-        'RVEMI':'Emisores de Valores de Oferta Pública'
+        'RVEMI':'Emisores de Valores de Oferta Pública',
+        'RGEAE':'Empresas de Auditoria Externa',
+        'FINRE':'Fondos de Inversión No Rescatables',
+        'RGFEN':'Fondos de Inversión Capital Extranjero (FICE)',
+        'RGFER':'Fondos de Inversión Capital Extr. Riesgo',
+        'FIRES':'Fondos de Inversión Rescatables',
+        'RGFMU':'Fondos Mutuos',
+        'RGFVI':'Fondos para la Vivienda',
+        'RVSOC':'Otras Sociedades',
+        'RGAFP':'Soc. Adm. de Fondos de Pensiones',
+        'RGAFI':'Soc. Adm. Fondos Inversión',
+        'RGAFC':'Soc. Adm. Fondos Inversión Cap. Extr.',
+        'RGAFM':'Soc. Adm. Fondos Mutuos',
+        'RGAFV':'Soc. Adm. Fondos para la Vivienda',
+        'RGAGF':'Soc. Adm. Generales de Fondos',
+        'RGCCO':'Sociedades Adm. de Sistemas de Compensación y Liquidación',
+        'RGSEC':'Sociedades Securitizadoras',
+        'RVEXT':'Valores Extranjeros'
+
     }
     today = date.today()
     hesenciales_params = {
@@ -96,12 +115,12 @@ class EmpresasSpider(scrapy.Spider):
 
         data = response.meta['data']
         data['type'] = 'Essencial'
-        self.log('data: <%s>' % data)
+        #self.log('data: <%s>' % data)
         parameters = self.hesenciales_params
         parameters['rut'] = data['company_ICN'].split('-')[0]
         parameters['entidad'] = data['company_name']
         #parameters['meta'] = data
-        self.log('parameters: <%s>' % parameters)
+        #self.log('parameters: <%s>' % parameters)
         yield FormRequest(
                     url=response.url,
                     meta={'data':data},
@@ -121,9 +140,14 @@ class EmpresasSpider(scrapy.Spider):
             #data = Directory()
             data['doc_date'] = ''.join(item.xpath('td[1]/text()').extract()).strip()
             data['doc_ext_id'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
-            data['doc_url'] = ''.join(item.xpath('td[2]/a/@href').extract()).strip()
+            data['doc_url'] = self.base_url + ''.join(item.xpath('td[2]/a/@href').extract()).strip()
             data['doc_desc'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
-            self.log('data: <%s>' % data)
+            #self.log('data: <%s>' % data)
+            m = hashlib.md5()
+            to_hash = data['type'] + data['company_ICN'] + data['company_name'] + \
+                      data['doc_ext_id'] + data['doc_date'] + data['doc_url']
+            m.update(to_hash.encode('utf-8'))
+            data['id'] = m.hexdigest()
             return data
 
 
