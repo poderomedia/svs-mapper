@@ -19,6 +19,7 @@ class Directory(scrapy.Item):
     type = Field()
     company_ICN = Field()
     company_name = Field()
+    company_active = Field()
     person_ICN = Field()
     person_name = Field()
     person_jobtitle = Field()
