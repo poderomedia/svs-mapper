@@ -12,6 +12,7 @@ class EmpresasSpider(scrapy.Spider):
     base_query_url = 'http://www.svs.cl/institucional/mercados/consulta.php?mercado=V&Estado=TO&entidad=%s&_=1441566576260'
     base_url = 'http://www.svs.cl'
 
+    #needed more subtypes
     subtypes_names = {
         'RACRT':'Administradoras de Cartera',
         'RAFIP':'Administradoras de Fondos de Inversión Privados',
@@ -22,7 +23,8 @@ class EmpresasSpider(scrapy.Spider):
         'CLARI':'Clasificadoras de Riesgo',
         'COBOL':'Corredores de Bolsa',
         'IVCBP':'Corredores de Bolsa de Productos',
-        'RG268':'Deportivas no profesionales, de beneficencia o educacionales'
+        'RG268':'Deportivas no profesionales, de beneficencia o educacionales',
+        'RVEMI':'Emisores de Valores de Oferta Pública'
     }
     today = date.today()
     hesenciales_params = {
