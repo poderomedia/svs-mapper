@@ -5,6 +5,7 @@ from svs_mapper.items import Directory
 from scrapy.http import Request, FormRequest
 from datetime import date
 import hashlib
+import time
 
 
 class EmpresasSpider(scrapy.Spider):
@@ -74,9 +75,15 @@ class EmpresasSpider(scrapy.Spider):
             data = Directory()
             data['company_ICN'] = ''.join(item.xpath('td[1]/a/text()').extract()).strip()
             data['company_name'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
-            data['company_active'] = ''.join(item.xpath('td[3]/text()').extract()).strip()
+            active = ''.join(item.xpath('td[3]/text()').extract()).strip()
+            if (active=='VI') | (active=='NV'):
+                data['company_active'] = active
+            else:
+                data['company_admin'] = active
+                data['company_active'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
             link = self.base_url +'/institucional/mercados/'+ ''.join(item.xpath('td[1]/a/@href').extract()).strip()
             data['reference'] = link
+            data['scanner_date'] = self.today.strftime('%Y-%m-%dT%H:%M:%SZ')
 
             #essential facts
             request0 = Request(link.replace('pestania=1','pestania=25'),
@@ -138,14 +145,27 @@ class EmpresasSpider(scrapy.Spider):
 
         for item in docs:
             #data = Directory()
-            data['doc_date'] = ''.join(item.xpath('td[1]/text()').extract()).strip()
-            data['doc_ext_id'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
-            data['doc_url'] = self.base_url + ''.join(item.xpath('td[2]/a/@href').extract()).strip()
-            data['doc_desc'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
+            if data['type']=='Essencial':
+                self.log('type',data['type'])
+                date_str = ''.join(item.xpath('td[1]/text()').extract()).strip()
+                if (date_str !='') & (date_str !=u'Sin Información'):
+                    date_struct = time.strptime(date_str,'%d/%m/%Y %H:%M:%S')
+                    data['doc_date'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',date_struct)
+                data['doc_ext_id'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
+                data['doc_url'] = self.base_url + ''.join(item.xpath('td[2]/a/@href').extract()).strip()
+                data['doc_desc'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
+            else:
+                date_str = ''.join(item.xpath('td[2]/text()').extract()).strip()
+                if (date_str !='') & (date_str !=u'Sin Información'):
+                    date_struct = time.strptime(date_str,'%d.%m.%Y')
+                    data['doc_date'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',date_struct)
+                data['doc_ext_id'] = ''.join(item.xpath('td[1]/text()').extract()).strip()
+                data['doc_url'] = self.base_url + ''.join(item.xpath('td[4]/a/@href').extract()).strip()
+                data['doc_desc'] = ''.join(item.xpath('td[3]/text()').extract()).strip()
             #self.log('data: <%s>' % data)
             m = hashlib.md5()
             to_hash = data['type'] + data['company_ICN'] + data['company_name'] + \
-                      data['doc_ext_id'] + data['doc_date'] + data['doc_url']
+                      data['doc_ext_id'] + str(data['scanner_date']) + data['doc_url']
             m.update(to_hash.encode('utf-8'))
             data['id'] = m.hexdigest()
             return data

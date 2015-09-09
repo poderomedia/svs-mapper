@@ -5,6 +5,7 @@ from svs_mapper.items import Directory
 from scrapy.http import Request
 from datetime import date
 import hashlib
+import time
 
 
 class HistoricBoardsSpider(Spider):
@@ -45,10 +46,27 @@ class HistoricBoardsSpider(Spider):
             director['company_ICN'] = ''.join(item.xpath('td[1]/text()').extract()).strip()
             director['company_name'] = ''.join(item.xpath('td[2]/text()').extract()).strip()
             director['person_jobtitle'] = ''.join(item.xpath('td[3]/text()').extract()).strip()
+            director['type'] = 'Executive'
+            if ('Director' in director['person_jobtitle']) | ('Presidente' in director['person_jobtitle'])\
+                    | ('Vicepresidente' in director['person_jobtitle']):
+                director['type'] = 'Board'
+
             director['person_jobtitle_desc'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
-            director['person_datejob'] = ''.join(item.xpath('td[5]/text()').extract()).strip()
-            director['person_datejob_end'] = ''.join(item.xpath('td[6]/text()').extract()).strip()
-            director['scanner_date'] = self.today
+
+            #date object INI
+            date_str = ''.join(item.xpath('td[5]/text()').extract()).strip()
+            date_struct = time.strptime(date_str,'%d/%m/%Y')
+            director['person_datejob'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',date_struct)
+
+            #date object END
+            date_str_end = ''.join(item.xpath('td[6]/text()').extract()).strip()
+            if date_str_end != '':
+                date_struct_end = time.strptime(date_str_end,'%d/%m/%Y')
+                director['person_datejob_end'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',date_struct_end)
+            else:
+                director['person_datejob_end'] = 'NOW'
+
+            director['scanner_date'] = self.today.strftime('%Y-%m-%dT%H:%M:%SZ')
             m = hashlib.md5()
             to_hash = director['type'] + director['company_ICN'] + director['company_name'] + \
                       director['person_ICN'] + director['person_name'] + director['person_datejob'] +\
