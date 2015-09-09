@@ -33,6 +33,7 @@ That's all.
 * company_ICN: Company code (Chile - RUT)
 * company_name: name of the company
 * company_active: indicates if a company is active or not (values: VIG, NV)
+* company_admin: company controller
 * person_ICN: Person Code Number (Chile - RUT)
 * person_name: Name of the Person
 * person_jobtitle: Job title of the Person in the Company
@@ -54,9 +55,9 @@ That's all.
 There are the following spider:
 * svs: return all the present Boards members
 * executives: return all the present Executives members
-* historic_boards: return all the historic Board members (Past ans Present)
+* historic_boards: return all the historic Board members (Past and Present)
 * sanciones: return all sanctions between two dates (default: 01-01-2001 to present day)
-* empresas: return al companies with sanctions and essential facts
+* empresas: return al companies with sanctions and essential facts between two dates (default: 01-01-2001 to present day)
 
 
 ## Running a specific spider
