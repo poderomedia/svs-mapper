@@ -70,7 +70,7 @@ class HistoricBoardsSpider(Spider):
             m = hashlib.md5()
             to_hash = director['type'] + director['company_ICN'] + director['company_name'] + \
                       director['person_ICN'] + director['person_name'] + director['person_datejob'] +\
-                      director['person_datejob_end'] + director['person_jobtitle']
+                      director['person_jobtitle']
             m.update(to_hash.encode('utf-8'))
             director['id'] = m.hexdigest()
             director['reference'] = response.url

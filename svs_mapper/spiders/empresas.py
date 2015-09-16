@@ -165,7 +165,7 @@ class EmpresasSpider(scrapy.Spider):
             #self.log('data: <%s>' % data)
             m = hashlib.md5()
             to_hash = data['type'] + data['company_ICN'] + data['company_name'] + \
-                      data['doc_ext_id'] + str(data['scanner_date']) + data['doc_url']
+                      data['doc_ext_id'] + data['doc_url']
             m.update(to_hash.encode('utf-8'))
             data['id'] = m.hexdigest()
             return data
