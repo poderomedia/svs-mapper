@@ -31,3 +31,8 @@ class Directory(scrapy.Item):
     reference = Field()
     doc_url = Field()
 
+    #stock holders
+    stock_date = Field()
+    stock_name = Field()
+    stock_percentage = Field()
+

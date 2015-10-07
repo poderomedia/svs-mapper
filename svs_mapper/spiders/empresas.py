@@ -12,10 +12,14 @@ class EmpresasSpider(scrapy.Spider):
     name = "empresas"
     allowed_domains = ["svs.cl"]
     base_query_url = 'http://www.svs.cl/institucional/mercados/consulta.php?mercado=V&Estado=TO&entidad=%s&_=1441566576260'
+    base_query_url_security = 'http://www.svs.cl/institucional/mercados/consulta.php?mercado=S&Estado=TO&entidad=%s&_=1441566576260'
     base_url = 'http://www.svs.cl'
+
+    type= 'Essencial'
 
     #needed more subtypes
     subtypes_names = {
+        'RGABC':'Abogados Calificadores',
         'RACRT':'Administradoras de Cartera',
         'RAFIP':'Administradoras de Fondos de Inversión Privados',
         'AGVAL':'Agentes de Valores',
@@ -46,6 +50,24 @@ class EmpresasSpider(scrapy.Spider):
         'RVEXT':'Valores Extranjeros'
 
     }
+    subtypes_names_security = {
+        'RGAMH':'Agentes Administradores de Mutuos Hipotecarios Endosables',
+        'CSCRE':'Cías. de Seguros Crédito',
+        'CSVID':'Cías. de Seguros de Vida',
+        'CSGEN':'Cías. de Seguros Generales',
+        'REEXT':'Cías. Reaseguradoras Extranjeras',
+        'RGNAC':'Cías. Reaseguradoras Grales Nacionales',
+        'RVNAC':'Cías. Reaseguradoras Vida Nacionales',
+        'CREXT':'Corredores de Reaseguros Extranjeros',
+        'CRNAC':'Corredores de Reaseguros Nacionales',
+        'CSJUR':'Corredores de Seguros - Persona Jurídica',
+        'CSNAT':'Corredores de Seguros - Persona Natural',
+        'CRVJU':'Corredores Seguros Previs.-pers. jur.',
+        'CRVNA':'Corredores Seguros Previs.-pers. nat.',
+        'CSEXT':'Corredores y Cías. de Seguros Extranjeros (Por NCG 197)',
+        'LSJUR':'Liquidadores de Siniestros - pers. jur.',
+        'LSNAT':'Liquidadores de Siniestros - pers. nat.'
+    }
     today = date.today()
     hesenciales_params = {
         'dd':'01','mm':'01','aa':'2001',
@@ -63,7 +85,13 @@ class EmpresasSpider(scrapy.Spider):
         'dias':''
     }
 
-    start_urls = [base_query_url % key for key in subtypes_names.keys()]
+    start_urls = [base_query_url % key for key in subtypes_names.keys()] + [base_query_url_security % key for key in subtypes_names_security.keys()]
+
+    def __init__(self, type=None,*args, **kwargs):
+        super(EmpresasSpider, self).__init__(*args, **kwargs)
+
+        if type is not None:
+            self.type = type
 
     def parse(self, response):
 
@@ -86,17 +114,56 @@ class EmpresasSpider(scrapy.Spider):
             data['scanner_date'] = self.today.strftime('%Y-%m-%dT%H:%M:%SZ')
 
             #essential facts
-            request0 = Request(link.replace('pestania=1','pestania=25'),
-                              callback = self.hesenciales,
-                              meta = {'data':data}
-                              )
-            yield request0
-            request1 = Request(link.replace('pestania=1','pestania=36'),
-                              callback = self.sanctions,
-                              meta = {'data':data}
-                              )
+            if self.type == 'Essencial':
+                request0 = Request(link.replace('pestania=1','pestania=25'),
+                                  callback = self.hesenciales,
+                                  meta = {'data':data}
+                                  )
+                yield request0
 
-            yield request1
+            elif self.type == 'Sanction':
+                request1 = Request(link.replace('pestania=1','pestania=36'),
+                                  callback = self.sanctions,
+                                  meta = {'data':data}
+                                  )
+
+                yield request1
+            elif self.type == 'StockHolder':
+                request2 = Request(link.replace('pestania=1','pestania=5'),
+                                  callback = self.stockholder,
+                                  meta = {'data':data}
+                                  )
+                yield request2
+
+    def stockholder(self,response):
+        hxs = Selector(response)
+
+        data = response.meta['data']
+        data['type'] = 'StockHolder'
+        data['reference'] = response.url
+
+        date_str = ''.join(hxs.xpath('//tr[position() =1]/td[1]/text()').extract()).replace(u'(Ultimo Período Informado)','').strip()
+        #06 / 2015
+        try:
+            date_struct = time.strptime(date_str,'%m / %Y')
+            data['stock_date'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',date_struct)
+        except:
+            self.log('No Information: %s' % response.url)
+
+        stock_list = hxs.xpath('//tr[position() >1]')
+        for item in stock_list:
+            data['type'] = 'StockHolder'
+            data['stock_name'] = ''.join(item.xpath('td[1]/text()').extract()).strip()
+            data['stock_percentage'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
+            if data['stock_name'] == '':
+                data['type'] = 'Company'
+            m = hashlib.md5()
+            to_hash = data['type'] + data['company_ICN'] + data['company_name'] + \
+                      data['stock_name'] + data['stock_percentage']
+            m.update(to_hash.encode('utf-8'))
+            data['id'] = m.hexdigest()
+            yield data
+
 
     def sanctions(self, response):
 
@@ -145,15 +212,17 @@ class EmpresasSpider(scrapy.Spider):
 
         for item in docs:
             #data = Directory()
+            data['doc_ext_id'] = ''
+            data['doc_url'] = ''
             if data['type']=='Essencial':
                 self.log('type',data['type'])
                 date_str = ''.join(item.xpath('td[1]/text()').extract()).strip()
                 if (date_str !='') & (date_str !=u'Sin Información'):
                     date_struct = time.strptime(date_str,'%d/%m/%Y %H:%M:%S')
                     data['doc_date'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',date_struct)
-                data['doc_ext_id'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
-                data['doc_url'] = self.base_url + ''.join(item.xpath('td[2]/a/@href').extract()).strip()
-                data['doc_desc'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
+                    data['doc_ext_id'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
+                    data['doc_url'] = self.base_url + ''.join(item.xpath('td[2]/a/@href').extract()).strip()
+                    data['doc_desc'] = ''.join(item.xpath('td[4]/text()').extract()).strip()
             else:
                 date_str = ''.join(item.xpath('td[2]/text()').extract()).strip()
                 if (date_str !='') & (date_str !=u'Sin Información'):
@@ -162,6 +231,9 @@ class EmpresasSpider(scrapy.Spider):
                 data['doc_ext_id'] = ''.join(item.xpath('td[1]/text()').extract()).strip()
                 data['doc_url'] = self.base_url + ''.join(item.xpath('td[4]/a/@href').extract()).strip()
                 data['doc_desc'] = ''.join(item.xpath('td[3]/text()').extract()).strip()
+
+            if (data['doc_ext_id'] == '') | (data['doc_ext_id'] is None):
+                data['type'] = 'Company'
             #self.log('data: <%s>' % data)
             m = hashlib.md5()
             to_hash = data['type'] + data['company_ICN'] + data['company_name'] + \
