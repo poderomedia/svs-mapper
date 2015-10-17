@@ -20,6 +20,8 @@ class Directory(scrapy.Item):
     company_ICN = Field()
     company_name = Field()
     company_active = Field()
+    company_market = Field()
+    company_type = Field()
     company_admin = Field()
     person_ICN = Field()
     person_name = Field()

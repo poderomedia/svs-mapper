@@ -6,6 +6,7 @@ from scrapy.http import Request, FormRequest
 from datetime import date
 import hashlib
 import time
+from urlparse import urlparse,parse_qs
 
 
 class EmpresasSpider(scrapy.Spider):
@@ -98,11 +99,22 @@ class EmpresasSpider(scrapy.Spider):
         hxs = Selector(response)
 
         companies = hxs.xpath('//tr[td]')
+        query_parse = parse_qs(urlparse(response.url).query)
+        company_market = query_parse['mercado'][0]
+        company_type = query_parse['entidad'][0]
+        if company_market == 'V':
+            company_type_name = self.subtypes_names[company_type]
+            company_market = 'Valores'
+        elif company_market == 'S':
+            company_type_name = self.subtypes_names_security[company_type]
+            company_market = 'Security'
 
         for item in companies:
             data = Directory()
             data['company_ICN'] = ''.join(item.xpath('td[1]/a/text()').extract()).strip()
             data['company_name'] = ''.join(item.xpath('td[2]/a/text()').extract()).strip()
+            data['company_type'] = company_type_name
+            data['company_market'] = company_market
             active = ''.join(item.xpath('td[3]/text()').extract()).strip()
             if (active=='VI') | (active=='NV'):
                 data['company_active'] = active
