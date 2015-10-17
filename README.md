@@ -78,6 +78,8 @@ The Spider can crawl Esential facts, Sanctions and Stock holders.
 To crawl for a specific document you must use the type argument when running the spider.
 The type argument can be: "Essencial", "Sanction" or "StockHolder". The default value for type is "Essencial"
 
-For example, to crawl under empresas all the sanctions ypu must execute in terminal the following command:
+For example, to crawl under empresas all the sanctions you must execute in terminal the following command:
 
 ``scrapy crawl empresas -a type="Sanction" -t csv -o sanctions.csv``
+
+This command return all Sanctions for all companys in csv format in the ``sanctions.csv`` output file
