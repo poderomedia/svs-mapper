@@ -51,6 +51,11 @@ That's all.
 * doc_desc: Description of the Document
 * doc_url: Url of the Document
 
+### Stock Holders Fields
+* stock_date: date of the information (quarters)
+* stock_percentage: percentaje of the property
+* stock_name: Name of the Stock Holder
+
 
 ## The spiders
 

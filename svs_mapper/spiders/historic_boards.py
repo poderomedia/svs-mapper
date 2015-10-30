@@ -66,7 +66,7 @@ class HistoricBoardsSpider(Spider):
             else:
                 director['person_datejob_end'] = 'NOW'
 
-            director['scanner_date'] = self.today.strftime('%Y-%m-%dT%H:%M:%SZ')
+            director['scanner_date'] = 'NOW'
             m = hashlib.md5()
             to_hash = director['type'] + director['company_ICN'] + director['company_name'] + \
                       director['person_ICN'] + director['person_name'] + director['person_datejob'] +\
